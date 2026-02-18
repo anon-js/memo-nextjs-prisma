@@ -1,0 +1,68 @@
+name: Deploy Memo Production
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: SSH Remote Commands
+        uses: appleboy/ssh-action@v1.2.5
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          port: ${{ secrets.PORT }}
+          command_timeout: 30m
+          script: |
+            export PATH=$HOME/.nvm/versions/node/v22.22.0/bin:$PATH
+            cd ~/htdocs/memo
+
+            echo " "
+            echo " "
+            echo "==============================================="
+            echo "[Step 1] Fetching latest code..."
+            echo "==============================================="
+
+            git fetch origin main
+            git reset --hard origin/main
+
+            echo " "
+            echo " "
+            echo "==============================================="
+            echo "[Step 2] Checking dependency changes..."
+            echo "==============================================="
+
+            if git diff --name-only HEAD@{1} HEAD | grep -qE "package.json|pnpm-lock.yaml"; then
+              echo " > Dependencies changed. Running install..."
+              pnpm install --frozen-lockfile
+            else
+              echo " > No dependency changes. Skipping install."
+            fi
+
+            echo " "
+            echo " "
+            echo "==============================================="
+            echo "[Step 3] Checking source code changes..."
+            echo "==============================================="
+
+            if git diff --name-only HEAD@{1} HEAD | grep -qE "^(app/|src/|components/|lib/|public/|next.config.|tailwind.config.)"; then
+              echo " > Source code changed. Building..."
+              pnpm build
+              
+              echo " "
+              echo " "
+              echo "==============================================="
+              echo "[Step 4] Reloading Server..."
+              echo "==============================================="
+              pm2 reload memo --update-env
+              echo " > Reload Complete."
+            else
+              echo " > No source changes. Skipping build & reload."
+            fi
+            
+            echo " "
+            echo " "
