@@ -51,9 +51,12 @@ export default function LoginPage() {
             {isPending ? "로그인 중..." : "로그인"}
           </button>
 
-          <Link href="/signup" className="block text-center text-sm text-gray-600 hover:underline">
-            회원가입
-          </Link>
+          <span className="block text-center mt-4 text-sm text-gray-600">
+            메모가 처음이신가요?
+            <Link href="/signup" className="ml-2 hover:underline text-blue-600">
+              회원가입
+            </Link>
+          </span>
         </form>
       </div>
   );

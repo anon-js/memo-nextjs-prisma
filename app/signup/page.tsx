@@ -44,7 +44,7 @@ export default function SignupPage() {
   return (
     <div className="flex flex-col min-h-screen min-w-96 justify-center justify-self-center items-center">
       <div className="w-full max-w-sm">
-        <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">회원가입</h2>
+        <h2 className="text-2xl font-bold mb-6 text-gray-800">회원가입</h2>
         <form action={handleSubmit} className="space-y-4">
           <div>
             <input
@@ -98,7 +98,7 @@ export default function SignupPage() {
 
           <span className="block text-center mt-4 text-sm text-gray-600">
             이미 계정이 있으신가요?
-            <Link href="/login" className="hover:underline">
+            <Link href="/login" className="ml-2 hover:underline text-blue-600">
               로그인
             </Link>
           </span>
