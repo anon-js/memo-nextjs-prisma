@@ -1,11 +1,9 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import Editor from "@/components/Editor";
-import { redirect } from "next/navigation";
 
 export default async function MemoPage({ params }: { params: Promise<{ memoId: string }> }) {
   const session = await auth();
-  if (!session?.user?.id) redirect("/login");
 
   const { memoId } = await params;
 
@@ -14,7 +12,7 @@ export default async function MemoPage({ params }: { params: Promise<{ memoId: s
   const memo = await prisma.memo.findUnique({
     where: { 
       id: memoId,
-      userId: session.user.id 
+      userId: session!.user.id 
     },
     include: {
       children: { select: { id: true }, take: 1 }
