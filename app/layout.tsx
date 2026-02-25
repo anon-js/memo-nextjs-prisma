@@ -1,3 +1,7 @@
+import { getMemos } from "@/app/actions/memo";
+import { auth } from "@/auth";
+import { Sidebar } from "@/components/Sidebar";
+import { prisma } from "@/lib/prisma";
 import type { Metadata } from "next";
 import localFont from 'next/font/local';
 import "./globals.css";
@@ -17,20 +21,37 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await auth();
+
+  let freshUser = null;
+  if (session?.user?.id) {
+    freshUser = await prisma.user.findUnique({
+      where: { id: session.user.id },
+    });
+  }
+
+  const memos = session?.user ? await getMemos() : [];
+  
   return (
     <html lang="ko">
       <body
         className={`${pretendard.variable} antialiased`}
       >
-        <main className="flex flex-col flex-1">{children}</main>
-        <footer className="w-full text-center text-sm text-gray-500 p-4">
-          &copy; 2026. anon. All rights reserved.
-        </footer>
+        <div className="flex h-screen overflow-hidden">
+          {freshUser && (
+            <Sidebar user={freshUser} memos={memos} />
+          )}
+          <div className="flex-1 flex flex-col min-w-0">
+            <main className="flex-1 overflow-auto">
+              {children}
+            </main>
+          </div>
+        </div>
       </body>
     </html>
   );
