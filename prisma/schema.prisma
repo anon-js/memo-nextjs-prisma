@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model User {
+  id            String    @id @default(cuid())
+  userid        String    @unique
+  password      String
+  username      String
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  memos         Memo[]
+}
+
+model Memo {
+  id        String   @id @default(cuid())
+  title     String   @default("제목 없음")
+  content   String?  @db.LongText
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parentId  String?
+  parent    Memo?    @relation("MemoToChildren", fields: [parentId], references: [id], onDelete: Cascade)
+  children  Memo[]   @relation("MemoToChildren")
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([parentId])
+}
