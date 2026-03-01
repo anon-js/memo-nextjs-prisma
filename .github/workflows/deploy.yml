@@ -70,7 +70,7 @@ jobs:
               else
                 echo " > Server is NOT running. Starting fresh..."
 
-                pm2 start pnpm --name "memo" -- start
+                pm2 start pnpm --name "memo" -- start -p 3003
               fi
 
               echo " > Server Operation Complete."
