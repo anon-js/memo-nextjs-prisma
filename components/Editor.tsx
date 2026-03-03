@@ -2,10 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { saveMemo, deleteMemo } from "@/app/actions/memo";
+import { Button } from "@/components/ui/Button";
 import { Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { Memo } from "@/types";
 
-export default function Editor({ memo }: { memo: any }) {
+export default function Editor({ memo }: { memo: Memo }) {
   const router = useRouter();
   const [title, setTitle] = useState(memo.title);
   const [content, setContent] = useState(memo.content);
@@ -43,7 +45,7 @@ export default function Editor({ memo }: { memo: any }) {
         onChange={(e) => setTitle(e.target.value)}
         onBlur={handleBlur}
         placeholder="제목 없음"
-        className="text-4xl font-bold placeholder-gray-300 border-none outline-none w-full bg-transparent mb-4"
+        className="text-4xl font-bold border-none outline-none w-full bg-transparent mb-4" 
       />
 
       <textarea
@@ -54,9 +56,9 @@ export default function Editor({ memo }: { memo: any }) {
         className="w-full h-[60vh] resize-none border-none outline-none text-lg leading-relaxed bg-transparent"
       />
       
-      <button onClick={handleDelete} className="text-red-400 hover:text-red-600 flex items-center gap-1 mt-4 text-sm">
+      <Button variant="danger" onClick={handleDelete} className="w-fit mt-4">
         <Trash2 size={16}/> 삭제하기
-      </button>
+      </Button>
     </div>
   );
 }

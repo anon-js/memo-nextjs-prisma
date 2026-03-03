@@ -11,8 +11,7 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
   const validatedFields = RegisterSchema.safeParse(values);
 
   if (!validatedFields.success) {
-    console.log("에러 원인:", validatedFields.error.flatten());
-    return { error: "입력값이 올바르지 않습니다." };
+    return { error: "입력 정보를 다시 확인해 주세요." };
   }
 
   const { userid, password, username } = validatedFields.data;

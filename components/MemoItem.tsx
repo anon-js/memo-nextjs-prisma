@@ -5,15 +5,16 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ChevronRight, ChevronDown, FileText, Plus } from "lucide-react";
 import { createMemo } from "@/app/actions/memo";
+import { Memo } from "@/types";
 
 interface MemoProps {
-  memo: any;
-  allMemos: any[];
+  memo: Memo;
+  allMemos: Memo[];
   depth: number;
   activeId: string | null;
 }
 
-export default function MemoItem({ memo, allMemos, depth, activeId }: MemoProps) {
+export function MemoItem({ memo, allMemos, depth, activeId }: MemoProps) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
 

@@ -2,6 +2,7 @@ import { getMemos } from "@/app/actions/memo";
 import { auth } from "@/auth";
 import { Sidebar } from "@/components/Sidebar";
 import { prisma } from "@/lib/prisma";
+import { Memo } from "@/types";
 import type { Metadata } from "next";
 import localFont from 'next/font/local';
 import "./globals.css";
@@ -35,7 +36,7 @@ export default async function RootLayout({
     });
   }
 
-  const memos = session?.user ? await getMemos() : [];
+  const memos: Memo[] = session?.user ? await getMemos() : [];
   
   return (
     <html lang="ko">

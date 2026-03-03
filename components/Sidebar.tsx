@@ -5,17 +5,18 @@ import { EllipsisVertical, LogOut, Plus, Settings } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import MemoItem from "./MemoItem";
 import { signOut } from "next-auth/react";
+import { MemoItem } from "@/components/MemoItem";
+import { Dropdown } from "@/components/ui/Dropdown";
+import { User, Memo } from "@/types";
 
-export function Sidebar({ user, memos }: { user: any; memos: any[] }) {
+export function Sidebar({ user, memos }: { user: User; memos: Memo[] }) {
   const router = useRouter();
   const params = useParams();
   const currentMemoId = params?.memoId as string;
 
   const [optimisticMemos, setOptimisticMemos] = useState(memos);
   const [isMounted, setIsMounted] = useState(false);
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   useEffect(() => {
     setOptimisticMemos(memos);
@@ -76,42 +77,32 @@ export function Sidebar({ user, memos }: { user: any; memos: any[] }) {
         </div>
       </div>
       <div className="border-t border-gray-200 p-2 relative bg-gray-50">
-        {isProfileOpen && (
-          <div 
-            className="fixed inset-0 z-30" 
-            onClick={() => setIsProfileOpen(false)} 
-          />
-        )}
-        {isProfileOpen && (
-          <div className="absolute bottom-full left-0 w-full mb-2 px-2 z-40">
-            <div className="bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden px-1 py-2">
-              <Link href="/settings" className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2 transition rounded-lg">
-                <Settings size={16} />
-                <span>프로필 설정</span>
-              </Link>
-              <hr className="my-1 border-gray-200" />
-              <button
-                className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 transition rounded-lg"
-                onClick={handleLogout}
-              >
-                <LogOut size={16} />
-                <span>로그아웃</span>
-              </button>
+        <Dropdown 
+          trigger={
+            <div className="w-full flex items-center gap-2 p-1.5 rounded-md hover:bg-gray-200 transition text-left group">
+              <div className="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-bold shadow-sm">
+                {user.username.slice(0, 1).toUpperCase()}
+              </div>
+              <span className="flex-1 text-lg font-medium text-gray-700 truncate group-hover:text-gray-900">
+                {user.username}
+              </span>
+              <EllipsisVertical size={14} className="text-gray-400 group-hover:text-gray-600" />
             </div>
-          </div>
-        )}
-        <button 
-          onClick={() => setIsProfileOpen(!isProfileOpen)}
-          className="w-full flex items-center gap-2 p-1.5 rounded-md hover:bg-gray-200 transition text-left group"
+          }
         >
-          <div className="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-bold shadow-sm">
-            {user.username.slice(0, 1).toUpperCase()}
-          </div>
-          <span className="flex-1 text-lg font-medium text-gray-700 truncate group-hover:text-gray-900">
-            {user.username}
-          </span>
-          <EllipsisVertical size={14} className="text-gray-400 group-hover:text-gray-600" />
-        </button>
+          <Link href="/settings" className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2 transition rounded-lg">
+            <Settings size={16} />
+            <span>프로필 설정</span>
+          </Link>
+          <hr className="my-1 border-gray-200" />
+          <button
+            className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 transition rounded-lg"
+            onClick={handleLogout}
+          >
+            <LogOut size={16} />
+            <span>로그아웃</span>
+          </button>
+        </Dropdown>
       </div>
     </aside>
   );

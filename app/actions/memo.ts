@@ -1,63 +1,87 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
+import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { Memo, ApiResponse } from "@/types";
 
-export async function createMemo(parentId?: string) {
-  const session = await auth();
-  
-  if (!session?.user?.id) return { error: "로그인이 필요합니다." };
-
-  const newMemo = await prisma.memo.create({
-    data: {
-      userId: session.user.id,
-      title: "제목 없음",
-      content: "",
-      parentId: parentId || null,
-    },
-  });
-
-  revalidatePath("/");
-  return { success: true, memoId: newMemo.id };
-}
-
-export async function getMemos() {
+export async function getMemos(): Promise<Memo[]> {
   const session = await auth();
   if (!session?.user?.id) return [];
 
-  return await prisma.memo.findMany({
-    where: { userId: session.user.id },
-    orderBy: { updatedAt: "desc" },
-  });
+  try {
+    const memos = await prisma.memo.findMany({
+      where: { userId: session.user.id },
+      orderBy: { updatedAt: "desc" },
+    });
+    
+    return memos as Memo[];
+  } catch (error) {
+    console.error("메모 조회 에러:", error);
+    return [];
+  }
 }
 
-export async function saveMemo(memoId: string, title: string, content: string) {
+export async function createMemo(parentId: string | null = null): Promise<ApiResponse> {
   const session = await auth();
-  if (!session?.user?.id) return { error: "권한이 없습니다." };
+  if (!session?.user?.id) {
+    return { success: false, error: "로그인이 필요합니다." };
+  }
 
-  await prisma.memo.update({
-    where: {
-      id: memoId,
-      userId: session.user.id,
-    },
-    data: {
-      title,
-      content,
-    },
-  });
+  try {
+    const newMemo = await prisma.memo.create({
+      data: {
+        title: "",
+        content: "",
+        userId: session.user.id,
+        parentId: parentId,
+      },
+    });
 
-  revalidatePath("/");
-  return { success: true };
+    revalidatePath("/");
+    return { success: true, memoId: newMemo.id };
+  } catch (error) {
+    return { success: false, error: "메모 생성에 실패했습니다." };
+  }
 }
 
-export async function deleteMemo(memoId: string) {
+export async function saveMemo(
+  id: string, 
+  title: string, 
+  content: string
+): Promise<ApiResponse> {
   const session = await auth();
-  if (!session?.user?.id) return { error: "권한이 없습니다." };
+  if (!session?.user?.id) {
+    return { success: false, error: "권한이 없습니다." };
+  }
 
-  await prisma.memo.delete({
-    where: { id: memoId, userId: session.user.id },
-  });
+  try {
+    await prisma.memo.update({
+      where: { id, userId: session.user.id },
+      data: { title, content },
+    });
 
-  revalidatePath("/");
+    revalidatePath("/");
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: "저장 중 오류가 발생했습니다." };
+  }
+}
+
+export async function deleteMemo(id: string): Promise<ApiResponse> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { success: false, error: "권한이 없습니다." };
+  }
+
+  try {
+    await prisma.memo.delete({
+      where: { id, userId: session.user.id },
+    });
+
+    revalidatePath("/");
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: "삭제 중 오류가 발생했습니다." };
+  }
 }
