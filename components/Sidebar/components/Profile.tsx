@@ -5,19 +5,15 @@ import { signOut } from "next-auth/react";
 import { Dropdown } from "@/components/ui/Dropdown";
 import { User } from "@/types";
 import { Button } from "@/components/ui/Button";
-import { useState } from "react";
 
 export default function Profile({ user }: { user: User }) {
-  const [isPending, setIsPending] = useState(false);
-  
   const handleLogout = () => {
-    setIsPending(true);
     signOut({ redirectTo: "/login" });
   };
 
   return (
-    <div className="flex items-center justify-between p-4">
-      <div className="flex items-center gap-2 text-left">
+    <div className="flex md:items-center items-start justify-between max-md:flex-col max-md:gap-4">
+      <div className="flex items-center gap-2 text-left max-md:ps-0.5">
         <div className="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm font-bold">
           {user.username[0].toUpperCase()}
         </div>
@@ -25,13 +21,14 @@ export default function Profile({ user }: { user: User }) {
           {user.username}
         </span>
       </div>
-      <Dropdown className="relative">
+      <Dropdown className="relative max-md:hidden">
         <Dropdown.Trigger>
           <Button
             variant="ghost"
             icon={Settings}
             iconSize={20}
             className="p-2"
+            title="설정"
           />
         </Dropdown.Trigger>
         <Dropdown.List side="bottom" align="end">
@@ -44,6 +41,28 @@ export default function Profile({ user }: { user: User }) {
           </Dropdown.Item>
         </Dropdown.List>
       </Dropdown>
+      <div className="flex items-center gap-2 md:hidden w-[-webkit-fill-available]">
+        <Button
+          icon={User2}
+          variant="ghost"
+          className="p-2"
+          href="/profile"
+          title="프로필 설정"
+          fullWidth
+        >
+          프로필 설정
+        </Button>
+        <Button
+          icon={LogOut}
+          variant="danger"
+          className="p-2"
+          onClick={handleLogout}
+          title="로그아웃"
+          fullWidth
+        >
+          로그아웃
+        </Button>
+      </div>
     </div>
   );
 }

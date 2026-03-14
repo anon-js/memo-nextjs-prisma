@@ -51,7 +51,7 @@ const DropdownRoot = forwardRef<HTMLDivElement, DropdownRootProps>(
       <DropdownContext.Provider value={{ isOpen, setIsOpen }}>
         <div 
           ref={setRefs}
-          className={`relative inline-block ${className}`} 
+          className={`relative inline-block z-9999 ${className}`} 
           {...props}
         >
           {children}

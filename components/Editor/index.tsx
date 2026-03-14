@@ -55,7 +55,7 @@ export default function Editor({ memo }: { memo: Memo }) {
   };
 
   return (
-    <div className="flex flex-col h-full bg-white">
+    <div className="flex flex-col h-full">
       <EditorHeader
         title={currentTitle}
         updatedAt={memo.updatedAt}

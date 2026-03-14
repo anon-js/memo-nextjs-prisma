@@ -1,6 +1,7 @@
 import { getMemos } from "@/app/actions/memo";
 import { auth } from "@/auth";
 import { Sidebar } from "@/components/Sidebar";
+import WorkspaceContainer from "@/components/workspace/WorkspaceContainer";
 import { SidebarProvider } from "@/context/SidebarContext";
 import { prisma } from "@/lib/prisma";
 
@@ -18,13 +19,11 @@ export default async function WorkspaceLayout({
 
   return (
     <SidebarProvider>
-      <div className="flex h-screen p-2 overflow-hidden">
+      <div className="flex h-screen w-full bg-white overflow-hidden relative">
         <Sidebar user={freshUser!} memos={memos} />
-        <div className="flex-4 flex flex-col min-w-0">
-          <main className="flex-1 overflow-auto bg-white">
-            {children}
-          </main>
-        </div>
+        <WorkspaceContainer>
+          {children}
+        </WorkspaceContainer>
       </div>
     </SidebarProvider>
   );
