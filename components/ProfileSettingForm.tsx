@@ -3,35 +3,37 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { updateProfile, deleteAccount } from "@/app/actions/user";
-import { Save, Trash2 } from "lucide-react";
+import { Loader2, Trash2 } from "lucide-react";
 import { Button } from "./ui/Button";
+import { Input } from "./ui/Input";
 
 export default function ProfileSettingForm({ user }: { user: any }) {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState("");
+  const [isNicknamePending, setIsNicknamePending] = useState(false);
+  const [isDeleteAccountPending, setIsDeleteAccountPending] = useState(false);
 
-  const handleSubmit = async (formData: FormData) => {
-    setIsLoading(true);
-    setMessage("");
-    
+  const onBlurSaveEditProfile = async (formData: FormData) => {
+    setIsNicknamePending(true);
+
     const result = await updateProfile(formData);
     
-    if (result.success) {
-      setMessage("✅ 프로필이 업데이트되었습니다.");
-      router.refresh();
-    } else {
-      setMessage(`❌ ${result.error}`);
-    }
-    setIsLoading(false);
+    if (result.success) router.refresh();
+
+    setIsNicknamePending(false);
   };
 
-  const handleDelete = async () => {
+  const handleEnterBlur = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.currentTarget.blur();
+    }
+  };
+
+  const handleDeleteAccount = async () => {
     if (!confirm("정말 탈퇴하시겠습니까? 작성한 모든 메모가 삭제되며 복구할 수 없습니다.")) {
       return;
     }
     
-    setIsLoading(true);
+    setIsDeleteAccountPending(true);
     await deleteAccount();
   };
 
@@ -40,18 +42,27 @@ export default function ProfileSettingForm({ user }: { user: any }) {
       <section>
         <h1 className="text-xl font-bold mb-2 ps-2">프로필 수정</h1>
         <hr className="border-gray-200" />
-        <form action={handleSubmit} className="flex flex-col gap-2 space-y-4 px-2 py-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">닉네임</label>
-            <input
+        <div className="px-2 py-4">
+          <p className="text-sm font-medium text-gray-700">닉네임</p>
+          <div className="relative">
+            <Input
               name="username"
-              type="text"
+              placeholder="닉네임을 입력해 주세요."
               defaultValue={user.username}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onBlur={(e) => {
+                if (e.target.value === user.username) return;
+                
+                const formData = new FormData();
+                formData.append("username", e.target.value);
+                onBlurSaveEditProfile(formData);
+              }}
+              onKeyDown={handleEnterBlur}
+              disabled={isNicknamePending}
               required
             />
+            <Loader2 className={`absolute right-3 top-1/2 -translate-y-1/2 animate-spin ${isNicknamePending ? "visible" : "hidden"}`} size={16} />
           </div>
-        </form>
+        </div>
       </section>
       <section className="mt-16">
         <h1 className="text-xl font-bold mb-2 ps-2">위험 구역</h1>
@@ -65,8 +76,8 @@ export default function ProfileSettingForm({ user }: { user: any }) {
           <Button
             variant="danger"
             icon={Trash2}
-            onClick={handleDelete}
-            disabled={isLoading}
+            onClick={handleDeleteAccount}
+            disabled={isDeleteAccountPending}
           >
             계정 탈퇴하기
           </Button>
