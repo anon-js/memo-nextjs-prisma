@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { ChevronLeft, Clock, Loader2, Menu, MoreVertical, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Dropdown } from "@/components/ui/Dropdown";
 import { cn, formatDate } from "@/lib/utils";
+import { ChevronLeft, Clock, Loader2, Menu, MoreVertical, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
 
 interface EditorHeaderProps {
   title: string;
@@ -79,7 +79,12 @@ export function EditorHeader({
             ) : (
               <div className="flex items-center gap-1">
                 <Clock size={12} />
-                <span className="text-sm font-normal">{formatDate(updatedAt)}</span>
+                <span
+                  className="text-sm font-normal"
+                  suppressHydrationWarning
+                >
+                  {formatDate(updatedAt)}
+                </span>
               </div>
             )}
           </div>
