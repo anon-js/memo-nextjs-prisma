@@ -55,7 +55,7 @@ export function EditorHeader({
           icon={isSidebarOpen ? ChevronLeft : Menu}
           iconSize={isSidebarOpen ? 26 : 20}
           onClick={toggleSidebar}
-          className={cn(isSidebarOpen ? "p-1.25" : "p-2")}
+          className={cn(isSidebarOpen ? "p-1.25" : "p-2", "transition-none")}
           title={isSidebarOpen ? "사이드바 접기" : "사이드바 펼치기"}
         />
 
